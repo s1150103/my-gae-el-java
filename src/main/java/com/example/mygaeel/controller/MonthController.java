@@ -1,0 +1,40 @@
+package com.example.mygaeel.controller;
+
+import com.example.mygaeel.service.MonthService;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.Map;
+
+@RestController
+public class MonthController {
+
+    private final MonthService monthService;
+
+    public MonthController(MonthService monthService) {
+        this.monthService = monthService;
+    }
+
+    /**
+     * GET,POST /month - 月次データ（mode=t/e）
+     */
+    @RequestMapping(value = "/month", method = {RequestMethod.GET, RequestMethod.POST})
+    public ResponseEntity<Map<String, Object>> elMonth(
+            @RequestParam(required = false) String mode,
+            @RequestParam(name = "rid", required = false) String regionId,
+            @RequestParam(required = false) String year,
+            @RequestParam(required = false) String month) {
+
+        if (mode == null || regionId == null || year == null || month == null) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Missing required parameters"));
+        }
+
+        if ("t".equals(mode)) {
+            return ResponseEntity.ok(monthService.processTotalMode(year, month, regionId));
+        } else if ("e".equals(mode)) {
+            return ResponseEntity.ok(monthService.processEachMode(year, month, regionId));
+        }
+
+        return ResponseEntity.badRequest().body(Map.of("error", "Invalid mode parameter"));
+    }
+}
