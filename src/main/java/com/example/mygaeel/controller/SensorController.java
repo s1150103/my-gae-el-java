@@ -4,6 +4,7 @@ import com.example.mygaeel.model.ElState;
 import com.example.mygaeel.model.SensorData;
 import com.example.mygaeel.service.ElStateService;
 import com.example.mygaeel.service.ElTargetService;
+import com.example.mygaeel.service.RegionAccessService;
 import com.example.mygaeel.service.SensorDataService;
 import com.google.cloud.datastore.Entity;
 import org.springframework.http.MediaType;
@@ -18,13 +19,16 @@ public class SensorController {
     private final SensorDataService sensorDataService;
     private final ElTargetService elTargetService;
     private final ElStateService elStateService;
+    private final RegionAccessService regionAccessService;
 
     public SensorController(SensorDataService sensorDataService,
                             ElTargetService elTargetService,
-                            ElStateService elStateService) {
+                            ElStateService elStateService,
+                            RegionAccessService regionAccessService) {
         this.sensorDataService = sensorDataService;
         this.elTargetService = elTargetService;
         this.elStateService = elStateService;
+        this.regionAccessService = regionAccessService;
     }
 
     /**
@@ -97,6 +101,10 @@ public class SensorController {
     }
 
     private ResponseEntity<?> handleModeS(String sysId, String date) {
+        String regionId = elTargetService.getRegionIdByTarget(sysId);
+        if (regionId != null && !regionAccessService.canAccess(regionId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "このリージョンへのアクセス権限がありません"));
+        }
         List<Entity> results = sensorDataService.queryBySysIdAndDate(sysId, date);
 
         StringBuilder xml = new StringBuilder();
@@ -122,6 +130,10 @@ public class SensorController {
     private ResponseEntity<?> handleModeJ(String sysId, String date) {
         if (sysId == null || date == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "sysId または date が指定されていません"));
+        }
+        String regionId = elTargetService.getRegionIdByTarget(sysId);
+        if (regionId != null && !regionAccessService.canAccess(regionId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "このリージョンへのアクセス権限がありません"));
         }
 
         List<Entity> results = sensorDataService.queryBySysIdAndDate(sysId, date);

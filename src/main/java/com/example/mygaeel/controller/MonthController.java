@@ -1,6 +1,7 @@
 package com.example.mygaeel.controller;
 
 import com.example.mygaeel.service.MonthService;
+import com.example.mygaeel.service.RegionAccessService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -10,14 +11,13 @@ import java.util.Map;
 public class MonthController {
 
     private final MonthService monthService;
+    private final RegionAccessService regionAccessService;
 
-    public MonthController(MonthService monthService) {
+    public MonthController(MonthService monthService, RegionAccessService regionAccessService) {
         this.monthService = monthService;
+        this.regionAccessService = regionAccessService;
     }
 
-    /**
-     * GET,POST /month - 月次データ（mode=t/e）
-     */
     @RequestMapping(value = "/month", method = {RequestMethod.GET, RequestMethod.POST})
     public ResponseEntity<Map<String, Object>> elMonth(
             @RequestParam(required = false) String mode,
@@ -27,6 +27,10 @@ public class MonthController {
 
         if (mode == null || regionId == null || year == null || month == null) {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing required parameters"));
+        }
+
+        if (!regionAccessService.canAccess(regionId)) {
+            return ResponseEntity.status(403).body(Map.of("error", "このリージョンへのアクセス権限がありません"));
         }
 
         if ("t".equals(mode)) {

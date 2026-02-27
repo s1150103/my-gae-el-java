@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー管理</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<div class="max-w-4xl mx-auto py-10 px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">ユーザー管理</h1>
+        <a href="/" class="text-blue-500 hover:underline text-sm">← トップへ戻る</a>
+    </div>
+
+    <!-- 操作結果メッセージ -->
+    <p th:if="${param.updated}" class="mb-4 p-3 bg-green-100 text-green-700 rounded-lg">
+        ユーザー情報を更新しました
+    </p>
+    <p th:if="${param.deleted}" class="mb-4 p-3 bg-yellow-100 text-yellow-700 rounded-lg">
+        ユーザーを削除しました
+    </p>
+
+    <div class="bg-white rounded-lg shadow overflow-hidden">
+        <table class="w-full text-sm">
+            <thead class="bg-gray-50 text-gray-600 uppercase text-xs">
+                <tr>
+                    <th class="px-6 py-3 text-left">メールアドレス</th>
+                    <th class="px-6 py-3 text-left">ロール</th>
+                    <th class="px-6 py-3 text-left">担当リージョン</th>
+                    <th class="px-6 py-3 text-left">操作</th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-200">
+                <tr th:each="user : ${users}" class="hover:bg-gray-50">
+                    <td class="px-6 py-4 text-gray-800" th:text="${user.email}"></td>
+                    <td class="px-6 py-4">
+                        <span th:if="${user.role == 'ADMIN'}"
+                              class="px-2 py-1 bg-blue-100 text-blue-700 rounded-full text-xs font-medium">
+                            管理者
+                        </span>
+                        <span th:if="${user.role == 'INSPECTOR'}"
+                              class="px-2 py-1 bg-green-100 text-green-700 rounded-full text-xs font-medium">
+                            点検業者
+                        </span>
+                    </td>
+                    <td class="px-6 py-4 text-gray-600">
+                        <span th:if="${user.role == 'ADMIN'}" class="text-gray-400 italic">全リージョン</span>
+                        <span th:if="${user.role != 'ADMIN'}"
+                              th:text="${#strings.listJoin(user.allowedRegions, ', ')}">
+                        </span>
+                        <span th:if="${user.role != 'ADMIN' and #lists.isEmpty(user.allowedRegions)}"
+                              class="text-red-400 italic">未設定</span>
+                    </td>
+                    <td class="px-6 py-4">
+                        <a th:href="@{/admin/users/{email}/edit(email=${user.email})}"
+                           class="text-blue-500 hover:underline mr-3">編集</a>
+                        <form th:action="@{/admin/users/{email}/delete(email=${user.email})}"
+                              method="POST" class="inline"
+                              onsubmit="return confirm('このユーザーを削除しますか？')">
+                            <button type="submit" class="text-red-500 hover:underline">削除</button>
+                        </form>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="4" class="px-6 py-8 text-center text-gray-400">
+                        ユーザーが登録されていません
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+</body>
+</html>

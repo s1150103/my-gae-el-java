@@ -7,6 +7,7 @@ import com.google.cloud.datastore.Entity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
+import java.util.List;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
@@ -140,5 +141,14 @@ public class ElStateService {
 
     public Map<String, ElState> getDynamicStateMap() {
         return dynamicStateMap;
+    }
+
+    /** EoE_Eden_Number.xml から読み込んだ全リージョンIDを返す（管理画面用） */
+    public List<String> getKnownRegionIds() {
+        return stateMap.values().stream()
+                .map(ElState::getRegionId)
+                .distinct()
+                .sorted()
+                .toList();
     }
 }

@@ -42,6 +42,8 @@ public class SecurityConfig {
                 .requestMatchers("/login", "/register").permitAll()
                 .requestMatchers("/css/**", "/js/**", "/lib/**", "/*.css", "/*.png").permitAll()
                 .requestMatchers("/ellighttracker2").permitAll()  // IoTデバイスからのデータ受信
+                // 管理者専用
+                .requestMatchers("/admin/**").hasRole("ADMIN")
                 // 上記以外はすべてログイン必須
                 .anyRequest().authenticated()
             )

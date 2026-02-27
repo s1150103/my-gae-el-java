@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ja" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ユーザー編集</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 min-h-screen">
+
+<div class="max-w-xl mx-auto py-10 px-4">
+    <div class="flex justify-between items-center mb-6">
+        <h1 class="text-2xl font-bold text-gray-800">ユーザー編集</h1>
+        <a href="/admin/users" class="text-blue-500 hover:underline text-sm">← ユーザー一覧へ</a>
+    </div>
+
+    <div class="bg-white rounded-lg shadow p-6">
+        <p class="text-gray-500 text-sm mb-6">
+            対象ユーザー：<span class="font-medium text-gray-800" th:text="${user.email}"></span>
+        </p>
+
+        <form th:action="@{/admin/users/{email}/edit(email=${user.email})}" method="POST" class="space-y-6">
+
+            <!-- ロール選択 -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-2">ロール</label>
+                <div class="space-y-2">
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="INSPECTOR"
+                               th:checked="${user.role == 'INSPECTOR'}">
+                        <span>点検業者（担当リージョンのみ閲覧可）</span>
+                    </label>
+                    <label class="flex items-center gap-2">
+                        <input type="radio" name="role" value="ADMIN"
+                               th:checked="${user.role == 'ADMIN'}">
+                        <span>管理者（全リージョン閲覧・ユーザー管理可）</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- 担当リージョン選択 -->
+            <div>
+                <label class="block text-gray-700 font-medium mb-2">
+                    担当リージョン
+                    <span class="text-sm font-normal text-gray-400">（点検業者の場合のみ有効）</span>
+                </label>
+                <div class="space-y-2 border rounded-lg p-3 bg-gray-50">
+                    <label th:each="regionId : ${knownRegions}" class="flex items-center gap-2">
+                        <input type="checkbox"
+                               name="allowedRegions"
+                               th:value="${regionId}"
+                               th:checked="${#lists.contains(user.allowedRegions, regionId)}">
+                        <span>リージョン <span th:text="${regionId}" class="font-mono font-medium"></span></span>
+                    </label>
+                    <p th:if="${#lists.isEmpty(knownRegions)}"
+                       class="text-gray-400 text-sm italic">
+                        リージョンが見つかりません（EoE_Eden_Number.xml を確認してください）
+                    </p>
+                </div>
+            </div>
+
+            <div class="flex gap-3">
+                <button type="submit"
+                        class="flex-1 bg-blue-500 text-white py-2 rounded-lg hover:bg-blue-600 transition">
+                    保存
+                </button>
+                <a href="/admin/users"
+                   class="flex-1 text-center bg-gray-200 text-gray-700 py-2 rounded-lg hover:bg-gray-300 transition">
+                    キャンセル
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>
