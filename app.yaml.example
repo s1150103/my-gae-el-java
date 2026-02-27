@@ -1,0 +1,16 @@
+runtime: java17
+
+instance_class: F2
+
+# Supabase 接続情報
+# このファイルをコピーして app.yaml を作成し、実際の値を入力してください
+# app.yaml は .gitignore に含まれており git 管理外です
+env_variables:
+  SUPABASE_DB_URL: "jdbc:postgresql://aws-0-ap-northeast-1.pooler.supabase.com:6543/postgres?sslmode=require"
+  SUPABASE_DB_USER: "postgres.xxxxxxxxxxxx"
+  SUPABASE_DB_PASSWORD: "your-supabase-password"
+
+handlers:
+  - url: /.*
+    script: auto
+    secure: always

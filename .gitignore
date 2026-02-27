@@ -6,3 +6,7 @@ target/
 *.iml
 .DS_Store
 application-local.properties
+
+# Supabase 接続情報を含む本番用設定（git管理外）
+app.yaml
+.env
