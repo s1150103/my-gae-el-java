@@ -1,6 +1,6 @@
 package com.example.mygaeel.controller;
 
-import com.example.mygaeel.model.ElTarget;
+import com.example.mygaeel.entity.ElTargetEntity;
 import com.example.mygaeel.service.ElTargetService;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
@@ -32,15 +32,10 @@ public class HomeController {
         return "forward:/el_target_register.html";
     }
 
-    /**
-     * POST /target - ElTarget登録（JSON）
-     */
     @PostMapping("/target")
     @ResponseBody
     public ResponseEntity<Map<String, String>> registerTarget(@RequestBody Map<String, String> data) {
         try {
-            System.out.println("受信データ: " + data);
-
             String mode = data.getOrDefault("mode", "register");
             String regionId = data.get("regionId");
             String targetId = data.get("targetId");
@@ -53,19 +48,13 @@ public class HomeController {
                 return ResponseEntity.badRequest().body(Map.of("error", "Missing required parameters"));
             }
 
-            ElTarget target = new ElTarget(regionId, targetId, targetName);
-            elTargetService.save(target);
-
+            elTargetService.save(new ElTargetEntity(regionId, targetId, targetName));
             return ResponseEntity.ok(Map.of("message", "Target registered successfully"));
         } catch (Exception e) {
-            System.out.println("エラー発生: " + e.getMessage());
             return ResponseEntity.internalServerError().body(Map.of("error", "Internal server error"));
         }
     }
 
-    /**
-     * POST /elsettingtargets - ElTarget登録（フォーム）
-     */
     @PostMapping("/elsettingtargets")
     @ResponseBody
     public ResponseEntity<Map<String, String>> elSettingTargets(
@@ -81,23 +70,16 @@ public class HomeController {
             return ResponseEntity.badRequest().body(Map.of("error", "Missing required parameters"));
         }
 
-        ElTarget target = new ElTarget(rid, tid, tname);
-        elTargetService.save(target);
+        elTargetService.save(new ElTargetEntity(rid, tid, tname));
         return ResponseEntity.ok(Map.of("message", "Target registered successfully"));
     }
 
     @GetMapping("/KFormPaper3.html")
-    public String serveKFormPaper3() {
-        return "forward:/KFormPaper3.html";
-    }
+    public String serveKFormPaper3() { return "forward:/KFormPaper3.html"; }
 
     @GetMapping("/KunugiPaper.html")
-    public String serveKunugiPaper() {
-        return "forward:/KunugiPaper.html";
-    }
+    public String serveKunugiPaper() { return "forward:/KunugiPaper.html"; }
 
     @GetMapping("/Kunugi_graph.html")
-    public String serveKunugiGraph() {
-        return "forward:/Kunugi_graph.html";
-    }
+    public String serveKunugiGraph() { return "forward:/Kunugi_graph.html"; }
 }

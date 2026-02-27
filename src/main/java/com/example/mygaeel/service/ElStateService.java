@@ -1,31 +1,31 @@
 package com.example.mygaeel.service;
 
+import com.example.mygaeel.entity.ElTargetEntity;
+import com.example.mygaeel.entity.ElWorkRecordEntity;
 import com.example.mygaeel.model.ElState;
-import com.example.mygaeel.model.ElWorkRecord;
 import com.example.mygaeel.model.SensorData;
-import com.google.cloud.datastore.Entity;
 import jakarta.annotation.PostConstruct;
 import org.springframework.stereotype.Service;
 import org.w3c.dom.Document;
-import java.util.List;
 import org.w3c.dom.NodeList;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import java.io.InputStream;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
 public class ElStateService {
 
     private final Map<String, ElState> stateMap = new ConcurrentHashMap<>();
+    private final Map<String, ElState> dynamicStateMap = new ConcurrentHashMap<>();
+
     private final ElTargetService elTargetService;
     private final ElWorkRecordService elWorkRecordService;
-
-    // センサーデータ受信時に動的に追加するマップ（ElStateManager の el_state_map 相当）
-    private final Map<String, ElState> dynamicStateMap = new ConcurrentHashMap<>();
 
     public ElStateService(ElTargetService elTargetService, ElWorkRecordService elWorkRecordService) {
         this.elTargetService = elTargetService;
@@ -64,24 +64,19 @@ public class ElStateService {
         }
     }
 
-    /**
-     * センサーデータを受信して状態を更新する（/ellighttracker2 mode=d から呼び出し）
-     * Python の el_state_map と ElState.update_state() をまとめた実装
-     */
     public void updateState(SensorData sensorData) {
         String sysId = sensorData.getSysId();
 
-        // ElTarget から regionId を取得
-        Entity targetEntity = elTargetService.getTargetBySysId(sysId);
-        if (targetEntity == null) {
+        Optional<ElTargetEntity> targetOpt = elTargetService.getTargetBySysId(sysId);
+        if (targetOpt.isEmpty()) {
             System.out.println("sysId " + sysId + " に対応する targetId が見つかりません");
             return;
         }
 
-        String targetId = targetEntity.getString("targetId");
-        String regionId = targetEntity.getString("regionId");
+        ElTargetEntity target = targetOpt.get();
+        String targetId = target.getTargetId();
+        String regionId = target.getRegionId();
 
-        // dynamicStateMap に ElState がなければ作成
         dynamicStateMap.computeIfAbsent(sysId, id -> {
             System.out.println("ElState 作成: sysId=" + sysId + ", regionId=" + regionId);
             return new ElState(sysId, regionId);
@@ -101,8 +96,8 @@ public class ElStateService {
         for (Map.Entry<String, Double> entry : lastData.entrySet()) {
             String chKey = entry.getKey();
             double prevValue = entry.getValue() != null ? entry.getValue() : 0.0;
-            Double newValueRaw = parsedData.get(chKey);
-            double newValue = newValueRaw != null ? newValueRaw : 0.0;
+            double newValue = parsedData.getOrDefault(chKey, 0.0) != null
+                    ? parsedData.getOrDefault(chKey, 0.0) : 0.0;
 
             int chNum;
             try {
@@ -111,12 +106,12 @@ public class ElStateService {
                 continue;
             }
 
-            Map<String, ElWorkRecord> activeRecords = state.getActiveRecords();
+            Map<String, ElWorkRecordEntity> activeRecords = state.getActiveRecords();
 
             if (prevValue <= 3.0 && newValue > 3.0) {
                 long startTime = System.currentTimeMillis();
-                System.out.println("ElWorkRecord 作成: " + regionId + " - " + chNum + " (開始: " + startTime + ")");
-                ElWorkRecord record = new ElWorkRecord(regionId, targetId, startTime, newValue);
+                System.out.println("ElWorkRecord 作成: " + regionId + " - " + chNum);
+                ElWorkRecordEntity record = new ElWorkRecordEntity(regionId, targetId, startTime, newValue);
                 elWorkRecordService.save(record);
                 activeRecords.put(chKey, record);
 
@@ -124,14 +119,13 @@ public class ElStateService {
                 long endTime = System.currentTimeMillis();
                 elWorkRecordService.updateEndTime(activeRecords.get(chKey), endTime);
                 activeRecords.remove(chKey);
-                System.out.println("ElWorkRecord 更新: " + regionId + " - " + chNum + " (終了: " + endTime + ")");
+                System.out.println("ElWorkRecord 更新: " + regionId + " - " + chNum + " (終了)");
 
             } else if (newValue > 3.0 && activeRecords.containsKey(chKey)) {
-                ElWorkRecord record = activeRecords.get(chKey);
+                ElWorkRecordEntity record = activeRecords.get(chKey);
                 if (record.getMaxData() < newValue) {
                     record.setMaxData(newValue);
                     elWorkRecordService.save(record);
-                    System.out.println("ElWorkRecord 更新: maxData=" + newValue);
                 }
             }
 
@@ -143,7 +137,6 @@ public class ElStateService {
         return dynamicStateMap;
     }
 
-    /** EoE_Eden_Number.xml から読み込んだ全リージョンIDを返す（管理画面用） */
     public List<String> getKnownRegionIds() {
         return stateMap.values().stream()
                 .map(ElState::getRegionId)

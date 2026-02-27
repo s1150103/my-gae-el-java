@@ -1,8 +1,8 @@
 package com.example.mygaeel.controller;
 
+import com.example.mygaeel.entity.ElWorkRecordEntity;
 import com.example.mygaeel.service.ElWorkRecordService;
 import com.example.mygaeel.service.RegionAccessService;
-import com.google.cloud.datastore.Entity;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -26,23 +26,18 @@ public class WorkRecordController {
             return ResponseEntity.status(403).body(Map.of("error", "このリージョンへのアクセス権限がありません"));
         }
 
-        List<Entity> results = elWorkRecordService.queryByRegionId(regionId);
-
+        List<ElWorkRecordEntity> results = elWorkRecordService.queryByRegionId(regionId);
         List<Map<String, Object>> records = new ArrayList<>();
-        for (Entity entity : results) {
+        for (ElWorkRecordEntity e : results) {
             Map<String, Object> rec = new LinkedHashMap<>();
-            rec.put("ID", entity.getKey().getName());
-            rec.put("targetId", entity.getString("targetId"));
-            rec.put("startTime", entity.getLong("startTime"));
-            rec.put("endTime", entity.contains("endTime") && !entity.isNull("endTime")
-                    ? entity.getLong("endTime") : null);
-            rec.put("maxData", entity.getDouble("maxData"));
+            rec.put("ID", e.getId());
+            rec.put("targetId", e.getTargetId());
+            rec.put("startTime", e.getStartTime());
+            rec.put("endTime", e.getEndTime());
+            rec.put("maxData", e.getMaxData());
             records.add(rec);
         }
 
-        Map<String, Object> response = new LinkedHashMap<>();
-        response.put("regionId", regionId);
-        response.put("records", records);
-        return ResponseEntity.ok(response);
+        return ResponseEntity.ok(Map.of("regionId", regionId, "records", records));
     }
 }

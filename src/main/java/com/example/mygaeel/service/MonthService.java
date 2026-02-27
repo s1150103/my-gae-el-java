@@ -1,7 +1,7 @@
 package com.example.mygaeel.service;
 
-import com.example.mygaeel.model.ElCounter;
-import com.google.cloud.datastore.Entity;
+import com.example.mygaeel.entity.ElTargetEntity;
+import com.example.mygaeel.entity.ElWorkRecordEntity;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -25,28 +25,26 @@ public class MonthService {
      */
     public Map<String, Object> processTotalMode(String year, String month, String regionId) {
         String paddedMonth = String.format("%02d", Integer.parseInt(month));
+        List<ElWorkRecordEntity> records = elWorkRecordService.queryByYearMonthRegion(year, paddedMonth, regionId);
 
-        List<Entity> records = elWorkRecordService.queryByYearMonthRegion(year, paddedMonth, regionId);
+        Map<String, String> eqMap = new LinkedHashMap<>();
+        Map<String, long[]> counterMap = new HashMap<>();
 
-        Map<String, String> eqMap = new LinkedHashMap<>();       // targetId → targetName
-        Map<String, long[]> counterMap = new HashMap<>();         // "targetId@day" → [count, seconds]
-
-        for (Entity rec : records) {
-            Long startTime = rec.contains("startTime") ? rec.getLong("startTime") : null;
-            Long endTime = rec.contains("endTime") && !rec.isNull("endTime") ? rec.getLong("endTime") : null;
-
+        for (ElWorkRecordEntity rec : records) {
+            Long startTime = rec.getStartTime();
+            Long endTime = rec.getEndTime();
             if (startTime == null || endTime == null) continue;
 
             long uptimeSeconds = Math.max(0, (long) Math.ceil((endTime - startTime) / 1000.0));
             if (uptimeSeconds == 0) continue;
 
-            String targetId = rec.getString("targetId");
-            int day = Integer.parseInt(rec.getString("date"));
+            String targetId = rec.getTargetId();
+            int day = Integer.parseInt(rec.getDate());
             String key = targetId + "@" + day;
 
             if (!eqMap.containsKey(targetId)) {
-                Entity targetEntity = elTargetService.getTargetByKey(regionId, targetId);
-                eqMap.put(targetId, targetEntity != null ? targetEntity.getString("targetName") : "UNKNOWN");
+                Optional<ElTargetEntity> te = elTargetService.getTargetByKey(regionId, targetId);
+                eqMap.put(targetId, te.map(ElTargetEntity::getTargetName).orElse("UNKNOWN"));
             }
 
             counterMap.computeIfAbsent(key, k -> new long[]{0, 0});
@@ -61,28 +59,19 @@ public class MonthService {
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("date", day);
             for (String targetId : eqMap.keySet()) {
-                String key = targetId + "@" + day;
-                long[] counter = counterMap.getOrDefault(key, new long[]{0, 0});
-                long count = counter[0];
-                long seconds = counter[1];
-                entry.put("cycle" + targetId, count);
-                entry.put("time" + targetId, formatSeconds(seconds));
+                long[] counter = counterMap.getOrDefault(targetId + "@" + day, new long[]{0, 0});
+                entry.put("cycle" + targetId, counter[0]);
+                entry.put("time" + targetId, formatSeconds(counter[1]));
             }
             dataObjectList.add(entry);
         }
 
         List<Map<String, String>> eqList = new ArrayList<>();
         for (Map.Entry<String, String> e : eqMap.entrySet()) {
-            Map<String, String> eq = new LinkedHashMap<>();
-            eq.put("id", e.getKey());
-            eq.put("name", e.getValue());
-            eqList.add(eq);
+            eqList.add(Map.of("id", e.getKey(), "name", e.getValue()));
         }
 
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("eqList", eqList);
-        result.put("dataObjectList", dataObjectList);
-        return result;
+        return Map.of("eqList", eqList, "dataObjectList", dataObjectList);
     }
 
     /**
@@ -90,55 +79,41 @@ public class MonthService {
      */
     public Map<String, Object> processEachMode(String year, String month, String regionId) {
         String paddedMonth = String.format("%02d", Integer.parseInt(month));
-
-        List<Entity> records = elWorkRecordService.queryByYearMonthRegion(year, paddedMonth, regionId);
+        List<ElWorkRecordEntity> records = elWorkRecordService.queryByYearMonthRegion(year, paddedMonth, regionId);
 
         Map<String, String> targetMap = new LinkedHashMap<>();
         List<Map<String, Object>> dataList = new ArrayList<>();
 
-        for (Entity rec : records) {
-            String targetId = rec.getString("targetId");
+        for (ElWorkRecordEntity rec : records) {
+            String targetId = rec.getTargetId();
 
             if (!targetMap.containsKey(targetId)) {
-                Entity targetEntity = elTargetService.getTargetByKey(regionId, targetId);
-                if (targetEntity == null) {
-                    System.out.println("target_entity が存在しません: targetId=" + targetId);
-                    targetMap.put(targetId, "不明なターゲット");
-                } else {
-                    targetMap.put(targetId, targetEntity.getString("targetName"));
-                }
+                Optional<ElTargetEntity> te = elTargetService.getTargetByKey(regionId, targetId);
+                targetMap.put(targetId, te.map(ElTargetEntity::getTargetName).orElse("不明なターゲット"));
             }
 
-            double rawMaxData = rec.contains("maxData") ? rec.getDouble("maxData") : 0.0;
-            BigDecimal maxData = BigDecimal.valueOf(rawMaxData).setScale(1, RoundingMode.HALF_UP);
-
-            Long startTime = rec.contains("startTime") ? rec.getLong("startTime") : null;
-            Long endTime = rec.contains("endTime") && !rec.isNull("endTime") ? rec.getLong("endTime") : null;
+            BigDecimal maxData = BigDecimal.valueOf(rec.getMaxData() != null ? rec.getMaxData() : 0.0)
+                    .setScale(1, RoundingMode.HALF_UP);
 
             long uptime = 0;
-            if (startTime != null && endTime != null) {
-                uptime = (endTime - startTime) / 1000;
+            if (rec.getStartTime() != null && rec.getEndTime() != null) {
+                uptime = (rec.getEndTime() - rec.getStartTime()) / 1000;
             }
 
             Map<String, Object> entry = new LinkedHashMap<>();
             entry.put("targetName", targetMap.get(targetId));
             entry.put("targetId", targetId);
             entry.put("MaxData", maxData.doubleValue());
-            entry.put("startTime", startTime != null ? startTime : "");
-            entry.put("endTime", endTime != null ? endTime : "");
+            entry.put("startTime", rec.getStartTime() != null ? rec.getStartTime() : "");
+            entry.put("endTime", rec.getEndTime() != null ? rec.getEndTime() : "");
             entry.put("upTime", uptime);
-            entry.put("date", rec.contains("date") ? rec.getString("date") : "");
+            entry.put("date", rec.getDate() != null ? rec.getDate() : "");
             dataList.add(entry);
         }
 
-        Map<String, Object> result = new LinkedHashMap<>();
-        result.put("datalist", dataList);
-        return result;
+        return Map.of("datalist", dataList);
     }
 
-    /**
-     * 秒を "HH:MM:SS" 形式に変換
-     */
     public static String formatSeconds(long totalSeconds) {
         long hours = totalSeconds / 3600;
         long minutes = (totalSeconds % 3600) / 60;

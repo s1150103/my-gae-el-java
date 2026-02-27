@@ -1,66 +1,50 @@
 package com.example.mygaeel.service;
 
+import com.example.mygaeel.entity.UserEntity;
 import com.example.mygaeel.model.CustomUserDetails;
-import com.google.cloud.datastore.*;
+import com.example.mygaeel.repository.UserRepository;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class UserService implements UserDetailsService {
 
-    private final Datastore datastore;
+    private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
-    public UserService(Datastore datastore, PasswordEncoder passwordEncoder) {
-        this.datastore = datastore;
+    public UserService(UserRepository userRepository, PasswordEncoder passwordEncoder) {
+        this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        Key key = datastore.newKeyFactory().setKind("User").newKey(email);
-        Entity entity = datastore.get(key);
-
-        if (entity == null) {
-            throw new UsernameNotFoundException("ユーザーが見つかりません: " + email);
-        }
-
-        String role = entity.contains("role") ? entity.getString("role") : "INSPECTOR";
-        List<String> allowedRegions = readRegionList(entity);
+        UserEntity entity = userRepository.findById(email)
+                .orElseThrow(() -> new UsernameNotFoundException("ユーザーが見つかりません: " + email));
 
         return new CustomUserDetails(
-                entity.getString("email"),
-                entity.getString("passwordHash"),
-                role,
-                allowedRegions
+                entity.getEmail(),
+                entity.getPasswordHash(),
+                entity.getRole(),
+                entity.getAllowedRegions()
         );
     }
 
     /**
-     * 新規ユーザー登録。
-     * ユーザーが1人もいない場合は最初のユーザーを ADMIN にする。
+     * 新規ユーザー登録。最初のユーザーは ADMIN になる。
      */
     public void register(String email, String rawPassword) {
-        Key key = datastore.newKeyFactory().setKind("User").newKey(email);
-        if (datastore.get(key) != null) {
+        if (userRepository.existsById(email)) {
             throw new IllegalArgumentException("このメールアドレスは既に登録されています");
         }
-
-        String role = countUsers() == 0 ? "ADMIN" : "INSPECTOR";
-
-        Entity entity = Entity.newBuilder(key)
-                .set("email", email)
-                .set("passwordHash", passwordEncoder.encode(rawPassword))
-                .set("role", role)
-                .set("allowedRegions", ListValue.of(List.of()))
-                .build();
-        datastore.put(entity);
+        String role = userRepository.count() == 0 ? "ADMIN" : "INSPECTOR";
+        UserEntity entity = new UserEntity(email, passwordEncoder.encode(rawPassword), role);
+        userRepository.save(entity);
         System.out.println("ユーザー登録: " + email + " role=" + role);
     }
 
@@ -68,65 +52,30 @@ public class UserService implements UserDetailsService {
      * 管理者がユーザーのロールと担当リージョンを更新する。
      */
     public void updateUser(String email, String role, List<String> allowedRegions) {
-        Key key = datastore.newKeyFactory().setKind("User").newKey(email);
-        Entity existing = datastore.get(key);
-        if (existing == null) {
-            throw new IllegalArgumentException("ユーザーが見つかりません: " + email);
-        }
-
-        List<StringValue> regionValues = allowedRegions.stream()
-                .map(StringValue::of)
-                .toList();
-
-        Entity updated = Entity.newBuilder(existing)
-                .set("role", role)
-                .set("allowedRegions", ListValue.of(regionValues))
-                .build();
-        datastore.put(updated);
-        System.out.println("ユーザー更新: " + email + " role=" + role + " regions=" + allowedRegions);
+        UserEntity entity = userRepository.findById(email)
+                .orElseThrow(() -> new IllegalArgumentException("ユーザーが見つかりません: " + email));
+        entity.setRole(role);
+        entity.setAllowedRegions(allowedRegions);
+        userRepository.save(entity);
+        System.out.println("ユーザー更新: " + email + " role=" + role);
     }
 
     /**
      * 全ユーザー一覧を取得（管理者用）。
      */
     public List<UserInfo> findAll() {
-        Query<Entity> query = Query.newEntityQueryBuilder().setKind("User").build();
-        QueryResults<Entity> results = datastore.run(query);
-
-        List<UserInfo> users = new ArrayList<>();
-        results.forEachRemaining(entity -> {
-            String role = entity.contains("role") ? entity.getString("role") : "INSPECTOR";
-            List<String> regions = readRegionList(entity);
-            users.add(new UserInfo(entity.getString("email"), role, regions));
-        });
-        return users;
+        return userRepository.findAll().stream()
+                .map(e -> new UserInfo(e.getEmail(), e.getRole(), e.getAllowedRegions()))
+                .toList();
     }
 
     /**
      * ユーザーを削除する（管理者用）。
      */
     public void deleteUser(String email) {
-        Key key = datastore.newKeyFactory().setKind("User").newKey(email);
-        datastore.delete(key);
+        userRepository.deleteById(email);
         System.out.println("ユーザー削除: " + email);
     }
 
-    private long countUsers() {
-        Query<Key> query = Query.newKeyQueryBuilder().setKind("User").build();
-        QueryResults<Key> results = datastore.run(query);
-        long count = 0;
-        while (results.hasNext()) { results.next(); count++; }
-        return count;
-    }
-
-    private List<String> readRegionList(Entity entity) {
-        if (!entity.contains("allowedRegions")) return List.of();
-        List<Value<?>> values = entity.getList("allowedRegions");
-        return values.stream()
-                .map(v -> (String) v.get())
-                .toList();
-    }
-
-    /** ユーザー情報の表示用DTO */
     public record UserInfo(String email, String role, List<String> allowedRegions) {}
 }

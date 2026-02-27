@@ -1,59 +1,39 @@
 package com.example.mygaeel.service;
 
-import com.example.mygaeel.model.ElTarget;
-import com.google.cloud.datastore.*;
+import com.example.mygaeel.entity.ElTargetEntity;
+import com.example.mygaeel.repository.ElTargetRepository;
 import org.springframework.stereotype.Service;
+
+import java.util.Optional;
 
 @Service
 public class ElTargetService {
 
-    private final Datastore datastore;
+    private final ElTargetRepository repository;
 
-    public ElTargetService(Datastore datastore) {
-        this.datastore = datastore;
+    public ElTargetService(ElTargetRepository repository) {
+        this.repository = repository;
     }
 
-    public void save(ElTarget target) {
-        Key key = datastore.newKeyFactory().setKind("ElTarget").newKey(target.getId());
-        Entity entity = Entity.newBuilder(key)
-                .set("regionId", target.getRegionId())
-                .set("targetId", target.getTargetId())
-                .set("targetName", target.getTargetName())
-                .build();
-        datastore.put(entity);
-        System.out.println("ElTarget 登録: regionId=" + target.getRegionId() + ", targetId=" + target.getTargetId());
+    public void save(ElTargetEntity entity) {
+        repository.save(entity);
+        System.out.println("ElTarget 登録: regionId=" + entity.getRegionId()
+                + ", targetId=" + entity.getTargetId());
     }
 
-    public Entity getTargetBySysId(String sysId) {
-        Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind("ElTarget")
-                .setFilter(StructuredQuery.PropertyFilter.eq("targetId", sysId))
-                .setLimit(1)
-                .build();
-        QueryResults<Entity> results = datastore.run(query);
-        return results.hasNext() ? results.next() : null;
+    public Optional<ElTargetEntity> getTargetBySysId(String sysId) {
+        return repository.findByTargetId(sysId);
     }
 
-    public Entity getTarget(String targetId) {
-        Query<Entity> query = Query.newEntityQueryBuilder()
-                .setKind("ElTarget")
-                .setFilter(StructuredQuery.PropertyFilter.eq("targetId", targetId))
-                .setLimit(1)
-                .build();
-        QueryResults<Entity> results = datastore.run(query);
-        return results.hasNext() ? results.next() : null;
+    public Optional<ElTargetEntity> getTarget(String targetId) {
+        return repository.findByTargetId(targetId);
     }
 
     public String getRegionIdByTarget(String targetId) {
-        Entity entity = getTarget(targetId);
-        if (entity != null) {
-            return entity.getString("regionId");
-        }
-        return null;
+        return getTarget(targetId).map(ElTargetEntity::getRegionId).orElse(null);
     }
 
-    public Entity getTargetByKey(String regionId, String targetId) {
-        Key key = datastore.newKeyFactory().setKind("ElTarget").newKey(regionId + "#" + targetId);
-        return datastore.get(key);
+    public Optional<ElTargetEntity> getTargetByKey(String regionId, String targetId) {
+        return repository.findById(regionId + "#" + targetId);
     }
 }

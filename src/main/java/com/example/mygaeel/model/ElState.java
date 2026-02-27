@@ -1,5 +1,7 @@
 package com.example.mygaeel.model;
 
+import com.example.mygaeel.entity.ElWorkRecordEntity;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -8,7 +10,7 @@ public class ElState {
     private final String sysId;
     private final String regionId;
     private Map<String, Double> lastData;
-    private final Map<String, ElWorkRecord> activeRecords;
+    private final Map<String, ElWorkRecordEntity> activeRecords;
 
     public ElState(String sysId, String regionId) {
         this.sysId = sysId;
@@ -39,5 +41,5 @@ public class ElState {
     public String getRegionId() { return regionId; }
     public Map<String, Double> getLastData() { return lastData; }
     public void setLastData(Map<String, Double> lastData) { this.lastData = lastData; }
-    public Map<String, ElWorkRecord> getActiveRecords() { return activeRecords; }
+    public Map<String, ElWorkRecordEntity> getActiveRecords() { return activeRecords; }
 }
