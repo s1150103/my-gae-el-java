@@ -1,0 +1,244 @@
+<mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+  <root>
+    <mxCell id="0" />
+    <mxCell id="1" parent="0" />
+
+    <!-- ===== 背景レイヤー (先に描画 → 背面に配置) ===== -->
+
+    <!-- Spring Boot Application 全体背景 -->
+    <mxCell id="bg_app" value="Spring Boot Application (my-gae-el-java)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#fffacd;strokeColor=#d6b656;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;align=center;" vertex="1" parent="1">
+      <mxGeometry x="20" y="130" width="900" height="340" as="geometry" />
+    </mxCell>
+
+    <!-- Controller 層 背景 -->
+    <mxCell id="bg_ctrl" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#ffe0e0;strokeColor=#b85450;opacity=50;" vertex="1" parent="1">
+      <mxGeometry x="30" y="165" width="880" height="65" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_ctrl" value="■ Controller 層" style="text;html=1;fontStyle=1;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="32" y="150" width="130" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- Service 層 背景 -->
+    <mxCell id="bg_svc" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f0e0f8;strokeColor=#9673a6;opacity=50;" vertex="1" parent="1">
+      <mxGeometry x="30" y="255" width="880" height="105" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_svc" value="■ Service 層" style="text;html=1;fontStyle=1;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="32" y="240" width="100" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- Repository 層 背景 -->
+    <mxCell id="bg_repo" value="" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#daeaf8;strokeColor=#6c8ebf;opacity=50;" vertex="1" parent="1">
+      <mxGeometry x="30" y="385" width="880" height="60" as="geometry" />
+    </mxCell>
+    <mxCell id="lbl_repo" value="■ Repository 層 (JPA)" style="text;html=1;fontStyle=1;fontSize=11;fillColor=none;strokeColor=none;" vertex="1" parent="1">
+      <mxGeometry x="32" y="370" width="150" height="18" as="geometry" />
+    </mxCell>
+
+    <!-- PostgreSQL (Supabase) 背景 -->
+    <mxCell id="bg_db" value="PostgreSQL (Supabase)" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;strokeWidth=2;verticalAlign=top;fontStyle=1;fontSize=14;fontColor=#333333;" vertex="1" parent="1">
+      <mxGeometry x="20" y="500" width="900" height="100" as="geometry" />
+    </mxCell>
+
+    <!-- ===== クライアント ===== -->
+
+    <mxCell id="iot" value="IoT デバイス&#xa;（センサー）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="90" y="30" width="130" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="browser_user" value="Webブラウザ&#xa;（一般ユーザー）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="390" y="30" width="130" height="60" as="geometry" />
+    </mxCell>
+
+    <mxCell id="browser_admin" value="Webブラウザ&#xa;（管理者）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#d5e8d4;strokeColor=#82b366;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="700" y="30" width="120" height="60" as="geometry" />
+    </mxCell>
+
+    <!-- ===== Controllers ===== -->
+
+    <mxCell id="ctrl_sensor" value="SensorController&#xa;/ellighttracker2" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="40" y="173" width="140" height="48" as="geometry" />
+    </mxCell>
+
+    <mxCell id="ctrl_home" value="HomeController&#xa;/ /target /download" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="195" y="173" width="135" height="48" as="geometry" />
+    </mxCell>
+
+    <mxCell id="ctrl_work" value="WorkRecordController&#xa;/elworkrecord" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="345" y="173" width="145" height="48" as="geometry" />
+    </mxCell>
+
+    <mxCell id="ctrl_auth" value="AuthController&#xa;/login /register" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="505" y="173" width="120" height="48" as="geometry" />
+    </mxCell>
+
+    <mxCell id="ctrl_admin" value="AdminController&#xa;/admin/**" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="640" y="173" width="115" height="48" as="geometry" />
+    </mxCell>
+
+    <mxCell id="ctrl_month" value="MonthController&#xa;/month" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f8cecc;strokeColor=#b85450;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="770" y="173" width="110" height="48" as="geometry" />
+    </mxCell>
+
+    <!-- ===== Services Row 1 ===== -->
+
+    <mxCell id="svc_sensor" value="SensorDataService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="40" y="263" width="135" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="svc_state" value="ElStateService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="190" y="263" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="svc_target" value="ElTargetService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="325" y="263" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="svc_work" value="ElWorkRecordService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="460" y="263" width="145" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="svc_month" value="MonthService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="620" y="263" width="115" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="svc_user" value="UserService" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="750" y="263" width="110" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- Services Row 2 -->
+
+    <mxCell id="svc_region" value="RegionAccessService&#xa;（リージョンアクセス権チェック）" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#e1d5e7;strokeColor=#9673a6;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="40" y="315" width="195" height="38" as="geometry" />
+    </mxCell>
+
+    <!-- ===== Repositories ===== -->
+
+    <mxCell id="repo_sensor" value="SensorDataRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="40" y="393" width="160" height="42" as="geometry" />
+    </mxCell>
+
+    <mxCell id="repo_target" value="ElTargetRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="215" y="393" width="150" height="42" as="geometry" />
+    </mxCell>
+
+    <mxCell id="repo_work" value="ElWorkRecordRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="380" y="393" width="170" height="42" as="geometry" />
+    </mxCell>
+
+    <mxCell id="repo_user" value="UserRepository" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#dae8fc;strokeColor=#6c8ebf;fontSize=10;" vertex="1" parent="1">
+      <mxGeometry x="565" y="393" width="135" height="42" as="geometry" />
+    </mxCell>
+
+    <!-- ===== DB Tables ===== -->
+
+    <mxCell id="tbl_sensor" value="sensor_data" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="40" y="524" width="130" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="tbl_target" value="el_targets" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="185" y="524" width="120" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="tbl_work" value="el_work_records" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="320" y="524" width="145" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="tbl_users" value="users" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="480" y="524" width="100" height="40" as="geometry" />
+    </mxCell>
+
+    <mxCell id="tbl_allowed" value="user_allowed_regions" style="rounded=1;whiteSpace=wrap;html=1;fillColor=#f5f5f5;strokeColor=#666666;fontSize=11;" vertex="1" parent="1">
+      <mxGeometry x="595" y="524" width="165" height="40" as="geometry" />
+    </mxCell>
+
+    <!-- ===== 矢印 (Edges) ===== -->
+
+    <!-- IoT → SensorController -->
+    <mxCell id="e_iot" value="センサーデータ送信&#xa;(mode=d)" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" source="iot" target="ctrl_sensor" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Browser User → HomeController -->
+    <mxCell id="e_user_home" value="HTTP" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" source="browser_user" target="ctrl_home" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Browser User → WorkRecordController -->
+    <mxCell id="e_user_work" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="browser_user" target="ctrl_work" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Browser Admin → AdminController -->
+    <mxCell id="e_admin" value="HTTP" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" source="browser_admin" target="ctrl_admin" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- SensorController → SensorDataService (代表例) -->
+    <mxCell id="e_ctrl_svc_sensor" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="ctrl_sensor" target="svc_sensor" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- SensorController → ElStateService -->
+    <mxCell id="e_ctrl_svc_state" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="ctrl_sensor" target="svc_state" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- AuthController → UserService -->
+    <mxCell id="e_ctrl_auth_user" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="ctrl_auth" target="svc_user" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- WorkRecordController → ElWorkRecordService -->
+    <mxCell id="e_ctrl_work_svc" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="ctrl_work" target="svc_work" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- MonthController → MonthService -->
+    <mxCell id="e_ctrl_month_svc" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="ctrl_month" target="svc_month" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- SensorDataService → SensorDataRepository -->
+    <mxCell id="e_svc_repo_sensor" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="svc_sensor" target="repo_sensor" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ElTargetService → ElTargetRepository -->
+    <mxCell id="e_svc_repo_target" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="svc_target" target="repo_target" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- ElWorkRecordService → ElWorkRecordRepository -->
+    <mxCell id="e_svc_repo_work" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="svc_work" target="repo_work" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- UserService → UserRepository -->
+    <mxCell id="e_svc_repo_user" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;endArrow=open;endFill=0;dashed=1;" edge="1" source="svc_user" target="repo_user" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- Repository → DB Tables -->
+    <mxCell id="e_repo_sensor_db" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="repo_sensor" target="tbl_sensor" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_repo_target_db" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="repo_target" target="tbl_target" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_repo_work_db" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="repo_work" target="tbl_work" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <mxCell id="e_repo_user_db" value="" style="edgeStyle=orthogonalEdgeStyle;html=1;" edge="1" source="repo_user" target="tbl_users" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+    <!-- users → user_allowed_regions (関連) -->
+    <mxCell id="e_users_allowed" value="1:N" style="edgeStyle=orthogonalEdgeStyle;html=1;fontSize=10;" edge="1" source="tbl_users" target="tbl_allowed" parent="1">
+      <mxGeometry relative="1" as="geometry" />
+    </mxCell>
+
+  </root>
+</mxGraphModel>
