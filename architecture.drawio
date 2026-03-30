@@ -1,0 +1,91 @@
+<mxfile host="app.diagrams.net">
+  <diagram name="GCP Architecture" id="gcp-architecture">
+    <mxGraphModel dx="1422" dy="762" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="1169" pageHeight="827" math="0" shadow="0">
+      <root>
+        <mxCell id="0" />
+        <mxCell id="1" parent="0" />
+
+        <!-- GCP 外枠 -->
+        <mxCell id="2" value="Google Cloud Platform (crud-170323)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.gcp2.group;grIcon=mxgraph.gcp2.group_gc_network;strokeColor=#3F51B5;fillColor=#E8EAF6;fontStyle=1;fontSize=13;fontColor=#3F51B5;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="280" y="80" width="780" height="620" as="geometry" />
+        </mxCell>
+
+        <!-- asia-northeast1 リージョン枠 -->
+        <mxCell id="3" value="asia-northeast1 (東京)" style="points=[[0,0],[0.25,0],[0.5,0],[0.75,0],[1,0],[1,0.25],[1,0.5],[1,0.75],[1,1],[0.75,1],[0.5,1],[0.25,1],[0,1],[0,0.75],[0,0.5],[0,0.25]];shape=mxgraph.gcp2.group;grIcon=mxgraph.gcp2.group_region;strokeColor=#E53935;fillColor=#FFEBEE;fontStyle=1;fontSize=11;fontColor=#E53935;verticalAlign=top;" vertex="1" parent="1">
+          <mxGeometry x="320" y="200" width="680" height="400" as="geometry" />
+        </mxCell>
+
+        <!-- ユーザー -->
+        <mxCell id="10" value="ユーザー&#xa;(ブラウザ)" style="shape=mxgraph.gcp2.user;fillColor=#4285F4;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="340" width="80" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- IoT センサー -->
+        <mxCell id="11" value="IoTセンサー&#xa;(ellight)" style="shape=mxgraph.gcp2.device;fillColor=#0F9D58;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="60" y="500" width="80" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Run -->
+        <mxCell id="20" value="Cloud Run&#xa;my-gae-el&#xa;(Spring Boot / Java 17)" style="shape=mxgraph.gcp2.cloud_run;fillColor=#4285F4;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="330" width="120" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Datastore -->
+        <mxCell id="30" value="Cloud Datastore&#xa;(Firestore in Datastore mode)&#xa;&#xa;・SensorData&#xa;・ElTarget&#xa;・ElWorkRecord&#xa;・User" style="shape=mxgraph.gcp2.datastore;fillColor=#DB4437;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="310" width="180" height="160" as="geometry" />
+        </mxCell>
+
+        <!-- Container Registry -->
+        <mxCell id="40" value="Container Registry&#xa;gcr.io/crud-170323/my-gae-el" style="shape=mxgraph.gcp2.container_registry;fillColor=#4285F4;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="450" y="560" width="120" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Build -->
+        <mxCell id="50" value="Cloud Build&#xa;(ビルド&amp;プッシュ)" style="shape=mxgraph.gcp2.cloud_build;fillColor=#F4B400;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="700" y="560" width="120" height="120" as="geometry" />
+        </mxCell>
+
+        <!-- 開発者 -->
+        <mxCell id="60" value="開発者&#xa;(gcloud CLI)" style="shape=mxgraph.gcp2.user;fillColor=#F4B400;strokeColor=none;fontStyle=1;fontSize=11;" vertex="1" parent="1">
+          <mxGeometry x="900" y="580" width="80" height="100" as="geometry" />
+        </mxCell>
+
+        <!-- ユーザー → Cloud Run (HTTPS) -->
+        <mxCell id="70" value="HTTPS" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#4285F4;fontStyle=1;fontSize=10;" edge="1" source="10" target="20" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- IoT → Cloud Run -->
+        <mxCell id="71" value="HTTP/HTTPS&#xa;mode=d" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#0F9D58;fontStyle=1;fontSize=10;" edge="1" source="11" target="20" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Run → Datastore -->
+        <mxCell id="72" value="読み書き" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#DB4437;fontStyle=1;fontSize=10;" edge="1" source="20" target="30" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Run → Container Registry (pull) -->
+        <mxCell id="73" value="イメージ pull" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#4285F4;fontStyle=1;fontSize=10;dashed=1;" edge="1" source="20" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Build → Container Registry (push) -->
+        <mxCell id="74" value="イメージ push" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#F4B400;fontStyle=1;fontSize=10;" edge="1" source="50" target="40" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- 開発者 → Cloud Build -->
+        <mxCell id="75" value="gcloud builds submit" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#F4B400;fontStyle=1;fontSize=10;" edge="1" source="60" target="50" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+        <!-- Cloud Build → Cloud Run (deploy) -->
+        <mxCell id="76" value="gcloud run deploy" style="edgeStyle=orthogonalEdgeStyle;strokeColor=#F4B400;fontStyle=1;fontSize=10;" edge="1" source="50" target="20" parent="1">
+          <mxGeometry relative="1" as="geometry" />
+        </mxCell>
+
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
