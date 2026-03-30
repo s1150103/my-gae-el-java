@@ -9,6 +9,6 @@ RUN mvn package -DskipTests -q
 # 実行ステージ
 FROM eclipse-temurin:17-jre-jammy
 WORKDIR /app
-COPY --from=build /app/target/my-gae-el-1.0.0.jar app.jar
+COPY --from=build /app/target/my-cloudrun-el-1.0.0.jar app.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-jar", "app.jar"]
